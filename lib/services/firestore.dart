@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreService {
-  
   //get all accounts
-  final  CollectionReference acounts = FirebaseFirestore.instance.collection('accounts');
+  final CollectionReference acounts =
+      FirebaseFirestore.instance.collection('accounts');
   //Create
-  Future<void> createAccount(String name, String username, String password, String userId) async {
+  Future<void> createAccount(
+      String name, String username, String password, String userId) async {
     return await acounts.add({
       'name': name,
       'username': username,
@@ -13,11 +14,9 @@ class FirestoreService {
       'userId': userId,
     }).then((value) => print("Account Added"));
   }
-    //read 
+  //read
 
   //update
 
   //delete
-
-
 }
