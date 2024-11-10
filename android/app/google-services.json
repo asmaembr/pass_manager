@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "865253042256",
+    "project_id": "passmanager-914c8",
+    "storage_bucket": "passmanager-914c8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:865253042256:android:0b3b8e6638e26243e44955",
+        "android_client_info": {
+          "package_name": "com.example.pass_manager"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOo_pSiwD_Spa2ivZfmNa1uk8VfEfCyok"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:865253042256:android:290bb645c2e30adae44955",
+        "android_client_info": {
+          "package_name": "com.passmanager.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOo_pSiwD_Spa2ivZfmNa1uk8VfEfCyok"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
