@@ -1,4 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:pass_manager/pages/LoginPage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:pass_manager/pages/HomePage.dart';
@@ -8,12 +10,14 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MainApp());
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool? isLoggedIn = prefs.getString('userid') != null;
+  runApp(MainApp(isLoggedIn: isLoggedIn));
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
-
+  final bool isLoggedIn ;
+  const MainApp({super.key, required this.isLoggedIn});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -35,7 +39,7 @@ class MainApp extends StatelessWidget {
               )),
               backgroundColor: Colors.amber[50]
               ),
-          body: const Homepage(),
+          body: isLoggedIn ? const Homepage() : const LoginPage(),
         ));
   }
 }
