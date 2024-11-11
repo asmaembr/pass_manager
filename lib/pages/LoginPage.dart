@@ -14,16 +14,16 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _telephoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _codeController = TextEditingController();
+  final TextEditingController _registercodeController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
-  final FirestoreService _service = FirestoreService();
-
-  bool _isLoading = false;
+  final FirestoreService service = FirestoreService();
 
   void clearControllers() {
     _usernameController.clear();
     _codeController.clear();
     _emailController.clear();
     _nameController.clear();
+    _registercodeController.clear();
     _telephoneController.clear();
   }
 
@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
       builder: (context) => AlertDialog(
         title: const Center(
           child:
-              Text("Add User", style: TextStyle(fontWeight: FontWeight.bold)),
+              Text("Register", style: TextStyle(fontWeight: FontWeight.bold)),
         ),
         backgroundColor: Colors.amber[50],
         content: Column(
@@ -54,41 +54,81 @@ class _LoginPageState extends State<LoginPage> {
             ),
             TextField(
               decoration: const InputDecoration(labelText: "code confidentiel"),
-              controller: _codeController,
+              controller: _registercodeController,
+              obscureText: true,
             ),
           ],
         ),
         actions: [
           FloatingActionButton(
-              mini: true,
-              backgroundColor: Colors.amber[100],
-              child: const Icon(Icons.check, color: Colors.black),
-              onPressed: () => {
-                    if (_service.registerUser(
-                            _nameController.text,
-                            _emailController.text,
-                            _telephoneController.text,
-                            _codeController.text) ==
-                        "Success")
-                      {clearControllers(), Navigator.pop(context)}
-                    else
-                      {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text("User already registered with this email or phone number")),
-                        )
-                      }
-                  }),
+            mini: true,
+            backgroundColor: Colors.amber[100],
+            child: const Icon(Icons.check, color: Colors.black),
+            onPressed: () async {
+              // Call registerUser asynchronously and await the result
+              String result = await service.registerUser(
+                _nameController.text,
+                _emailController.text,
+                _telephoneController.text,
+                _registercodeController.text,
+              );
+
+              if (result == "Success") {
+                clearControllers();
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("User registered successfully")),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(result)),
+                );
+              }
+            },
+          ),
         ],
       ),
     );
   }
 
+  Future<void> _loginUser() async {
+    bool loginSuccess = await service.loginUser(
+      _usernameController.text,
+      _codeController.text,
+    );
+
+    if (loginSuccess) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const Homepage()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("User not found or code incorrect")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+          title: const Center(
+              child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(width: 10),
+              Icon(Icons.lock_person_rounded, size: 40),
+              SizedBox(width: 10),
+              Text("Password Manager",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
+              SizedBox(width: 10),
+            ],
+          )),
+          backgroundColor: Colors.amber[50]),
+      backgroundColor: Colors.amber[50],
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -103,41 +143,24 @@ class _LoginPageState extends State<LoginPage> {
               decoration: const InputDecoration(labelText: 'code confidentiel'),
             ),
             const SizedBox(height: 20),
-            if (_isLoading)
-              const CircularProgressIndicator()
-            else
-              Row(
-                children: [
-                  FloatingActionButton(
-                    backgroundColor: Colors.amber[100],
-                    onPressed: () => {
-                      if (_service.loginUser(
-                          _usernameController.text, _codeController.text) == true)
-                        {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Homepage()),
-                          )
-                        }
-                      else
-                        {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text("User not found or code incorrect")),
-                          )
-                        }
-                    },
-                    child: const Icon(Icons.login, color: Colors.black),
-                  ),
-                  const SizedBox(width: 20),
-                  FloatingActionButton(
-                    backgroundColor: Colors.amber[100],
-                    child: const Icon(Icons.person_add, color: Colors.black),
-                    onPressed: () => openUserForm(),
-                  ),
-                ],
-              )
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FloatingActionButton(
+                  backgroundColor: Colors.amber[100],
+                  onPressed: _loginUser,
+                  heroTag: 'loginButton',
+                  child: const Icon(Icons.login, color: Colors.black),
+                ),
+                const SizedBox(width: 20),
+                FloatingActionButton(
+                  backgroundColor: Colors.amber[100],
+                  onPressed: openUserForm,
+                  heroTag: 'registerButton',
+                  child: const Icon(Icons.person_add, color: Colors.black),
+                ),
+              ],
+            )
           ],
         ),
       ),

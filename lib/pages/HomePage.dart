@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:pass_manager/pages/LoginPage.dart';
 import 'package:pass_manager/services/firestore.dart';
 
 class Homepage extends StatefulWidget {
@@ -24,13 +25,15 @@ class _HomepageState extends State<Homepage> {
     passwordController.clear();
   }
 
-  void openPaswwordForm(String? docID) {
+  void openPasswordForm(String? docID) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Center(
-          child: Text("Add Password",
-              style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Center(
+          child: Text(
+            docID != null ? "Edit Password" : "Add Password",
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
         ),
         backgroundColor: Colors.amber[50],
         content: Column(
@@ -55,6 +58,7 @@ class _HomepageState extends State<Homepage> {
           FloatingActionButton(
             mini: true,
             backgroundColor: Colors.amber[100],
+            heroTag: 'confirmButton',
             child: Icon(docID != null ? Icons.edit : Icons.check,
                 color: Colors.black),
             onPressed: () {
@@ -72,6 +76,7 @@ class _HomepageState extends State<Homepage> {
           FloatingActionButton(
             mini: true,
             backgroundColor: Colors.amber[100],
+            heroTag: 'cancelButton',
             onPressed: () {
               clearControllers();
               Navigator.pop(context);
@@ -86,10 +91,44 @@ class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+          title: Center(
+              child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(width: 10),
+                  Icon(Icons.lock_person_rounded, size: 40),
+                  SizedBox(width: 10),
+                  Text("Password Manager",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
+                  SizedBox(width: 10),
+                ],
+              ),
+              IconButton(
+                iconSize: 30,
+                onPressed: () => {
+                  service.logout(),
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginPage()))
+                },
+                icon: const Icon(
+                  Icons.logout,
+                ),
+              )
+            ],
+          )),
+          backgroundColor: Colors.amber[50]),
       backgroundColor: Colors.amber[50],
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.amber[100],
-        onPressed: () => openPaswwordForm(null),
+        heroTag: 'addPasswordButton',
+        onPressed: () => openPasswordForm(null),
         child: const Icon(Icons.add),
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -172,11 +211,11 @@ class _HomepageState extends State<Homepage> {
                         children: [
                           IconButton(
                             icon: const Icon(Icons.settings),
-                            onPressed: () => openPaswwordForm(docID),
+                            onPressed: () => openPasswordForm(docID),
                           ),
                           IconButton(
                             icon: const Icon(Icons.delete),
-                            onPressed: () => service.deleteAccount(docID),
+                            onPressed: () => service.deletePassword(docID),
                           ),
                         ],
                       ),

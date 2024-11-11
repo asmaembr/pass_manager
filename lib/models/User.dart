@@ -1,4 +1,3 @@
-
 class User {
   final String name;
   final String email;
@@ -10,7 +9,7 @@ class User {
     required this.email,
     required this.telephone,
     required this.code,
-  }) ;
+  });
 
   // Factory constructor to create a User from JSON
   factory User.fromJson(Map<String, dynamic> json) {
@@ -29,6 +28,4 @@ class User {
         'telephone': telephone,
         'code': code,
       };
-
-
 }
