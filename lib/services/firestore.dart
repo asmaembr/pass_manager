@@ -46,6 +46,8 @@ class FirestoreService {
     }
   }
 
+  
+
   // Update an existing password entry
   Future<String> updatePassword(
       String docID, String name, String username, String password) async {
@@ -88,12 +90,24 @@ class FirestoreService {
     }
   }
 
+  Future<String> getLoggedInName() async {
+    final userSnapshot = await getLoggedInUser();
+    String userId = userSnapshot.docs.first.id;
+    final snapshot =
+        await users.where(FieldPath.documentId, isEqualTo: userId).get();
+    return snapshot.docs.first.get('name');
+  }
+
   // Get user by phone
   Future<QuerySnapshot> getUserByPhone(String telephone, String code) {
     return users
         .where('telephone', isEqualTo: telephone)
         .where('code', isEqualTo: code)
         .get();
+  }
+
+  Future<QuerySnapshot> getPasswordById(String? docID) {
+    return passwords.where(FieldPath.documentId, isEqualTo: docID).get();
   }
 
   // Get user by email

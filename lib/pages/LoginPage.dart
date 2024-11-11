@@ -113,8 +113,9 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Center(
-              child: Row(
+        toolbarHeight: 80,
+        centerTitle: true,     
+          title: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(width: 10),
@@ -124,7 +125,7 @@ class _LoginPageState extends State<LoginPage> {
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
               SizedBox(width: 10),
             ],
-          )),
+          ),
           backgroundColor: Colors.amber[50]),
       backgroundColor: Colors.amber[50],
       body: Padding(

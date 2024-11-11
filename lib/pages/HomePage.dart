@@ -25,7 +25,18 @@ class _HomepageState extends State<Homepage> {
     passwordController.clear();
   }
 
-  void openPasswordForm(String? docID) {
+  void openPasswordForm(String? docID) async {
+    if (docID != null) {
+      QuerySnapshot snapshot = await service.getPasswordById(docID);
+
+      if (snapshot.docs.isNotEmpty) {
+        var passwordData = snapshot.docs.first.data() as Map<String, dynamic>;
+        nameController.text = passwordData['name'] ?? '';
+        usernameController.text = passwordData['username'] ?? '';
+        passwordController.text = passwordData['password'] ?? '';
+      }
+    }
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -59,8 +70,10 @@ class _HomepageState extends State<Homepage> {
             mini: true,
             backgroundColor: Colors.amber[100],
             heroTag: 'confirmButton',
-            child: Icon(docID != null ? Icons.edit : Icons.check,
-                color: Colors.black),
+            child: Icon(
+              docID != null ? Icons.edit : Icons.check,
+              color: Colors.black,
+            ),
             onPressed: () {
               if (docID != null) {
                 service.updatePassword(docID, nameController.text,
@@ -92,37 +105,44 @@ class _HomepageState extends State<Homepage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Center(
-              child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          toolbarHeight: 80,
+          centerTitle: true,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(width: 10),
-                  Icon(Icons.lock_person_rounded, size: 40),
-                  SizedBox(width: 10),
-                  Text("Password Manager",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
-                  SizedBox(width: 10),
-                ],
-              ),
+              const SizedBox(width: 10),
+              Column(children: [
+                const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.lock_person_rounded, size: 30),
+                      SizedBox(width: 10),
+                      Text("Password Manager",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 30))
+                    ]),
+                FutureBuilder(
+                    future: service.getLoggedInName(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return Text(snapshot.data.toString());
+                      } else {
+                        return const Text("Loading ...");
+                      }
+                    })
+              ]),
               IconButton(
-                iconSize: 30,
-                onPressed: () => {
-                  service.logout(),
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const LoginPage()))
-                },
-                icon: const Icon(
-                  Icons.logout,
-                ),
-              )
+                  iconSize: 30,
+                  onPressed: () => {
+                        service.logout(),
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LoginPage()))
+                      },
+                  icon: const Icon(Icons.logout))
             ],
-          )),
+          ),
           backgroundColor: Colors.amber[50]),
       backgroundColor: Colors.amber[50],
       floatingActionButton: FloatingActionButton(
