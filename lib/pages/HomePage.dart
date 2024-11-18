@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pass_manager/pages/LoginPage.dart';
 import 'package:pass_manager/services/firestore.dart';
+import 'dart:math';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -25,21 +26,36 @@ class _HomepageState extends State<Homepage> {
     passwordController.clear();
   }
 
-  void openPasswordForm(String? docID) async {
-    if (docID != null) {
-      QuerySnapshot snapshot = await service.getPasswordById(docID);
+  // Generate a random password
+  String generateRandomPassword() {
+    const length = 12;
+    const String chars =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#\$%^&*()-_+=<>?';
+    Random random = Random();
+    return String.fromCharCodes(Iterable.generate(
+        length, (_) => chars.codeUnitAt(random.nextInt(chars.length))));
+  }
 
-      if (snapshot.docs.isNotEmpty) {
-        var passwordData = snapshot.docs.first.data() as Map<String, dynamic>;
-        nameController.text = passwordData['name'] ?? '';
-        usernameController.text = passwordData['username'] ?? '';
-        passwordController.text = passwordData['password'] ?? '';
-      }
+void openPasswordForm(String? docID) async {
+  if (docID != null) {
+    QuerySnapshot snapshot = await service.getPasswordById(docID);
+
+    if (snapshot.docs.isNotEmpty) {
+      var passwordData = snapshot.docs.first.data() as Map<String, dynamic>;
+      nameController.text = passwordData['name'] ?? '';
+      usernameController.text = passwordData['username'] ?? '';
+      passwordController.text = passwordData['password'] ?? '';
     }
+  } else {
+    passwordController.text = generateRandomPassword(); // Auto-generate password for new entry
+  }
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
+  await showDialog(
+    context: context,
+    builder: (context) {
+      bool isPasswordVisible = false; // Local state for visibility inside the dialog
+
+      return AlertDialog(
         title: Center(
           child: Text(
             docID != null ? "Edit Password" : "Add Password",
@@ -47,59 +63,77 @@ class _HomepageState extends State<Homepage> {
           ),
         ),
         backgroundColor: Colors.amber[50],
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              decoration: const InputDecoration(labelText: "Name"),
-              controller: nameController,
-            ),
-            TextField(
-              decoration: const InputDecoration(labelText: "Username or email"),
-              controller: usernameController,
-            ),
-            TextField(
-              decoration: const InputDecoration(labelText: "Password"),
-              controller: passwordController,
-            ),
-          ],
+        content: StatefulBuilder(
+          builder: (context, setState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  decoration: const InputDecoration(labelText: "Name"),
+                  controller: nameController,
+                ),
+                TextField(
+                  decoration: const InputDecoration(labelText: "Username or email"),
+                  controller: usernameController,
+                ),
+                TextField(
+                  controller: passwordController,
+                  obscureText: !isPasswordVisible,
+                  decoration: InputDecoration(
+                    labelText: "Password",
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          isPasswordVisible = !isPasswordVisible;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
         actions: [
-          FloatingActionButton(
-            mini: true,
-            backgroundColor: Colors.amber[100],
-            heroTag: 'confirmButton',
-            child: Icon(
-              docID != null ? Icons.edit : Icons.check,
-              color: Colors.black,
-            ),
+          TextButton(
             onPressed: () {
               if (docID != null) {
-                service.updatePassword(docID, nameController.text,
-                    usernameController.text, passwordController.text);
+                service.updatePassword(
+                  docID,
+                  nameController.text,
+                  usernameController.text,
+                  passwordController.text,
+                );
               } else {
-                service.createPassword(nameController.text,
-                    usernameController.text, passwordController.text);
+                service.createPassword(
+                  nameController.text,
+                  usernameController.text,
+                  passwordController.text,
+                );
               }
               clearControllers();
               Navigator.pop(context);
             },
+            child: Text(
+              docID != null ? "Save Changes" : "Add Password",
+              style: const TextStyle(color: Colors.black),
+            ),
           ),
-          FloatingActionButton(
-            mini: true,
-            backgroundColor: Colors.amber[100],
-            heroTag: 'cancelButton',
+          TextButton(
             onPressed: () {
               clearControllers();
               Navigator.pop(context);
             },
-            child: const Icon(Icons.close, color: Colors.black),
+            child: const Text("Cancel", style: TextStyle(color: Colors.black)),
           ),
         ],
-      ),
-    );
-  }
+      );
+    },
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +156,7 @@ class _HomepageState extends State<Homepage> {
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 30))
                     ]),
-                    FutureBuilder(
+                FutureBuilder(
                     future: service.getLoggedInName(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
