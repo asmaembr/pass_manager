@@ -1,6 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:pass_manager/pages/LoginPage.dart';
-import 'package:pass_manager/services/firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -13,18 +12,14 @@ void main() async {
   );
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool? isLoggedIn = prefs.getString('userid') != null;
-
-  final FirestoreService service = FirestoreService();
   runApp(MainApp(
     isLoggedIn: isLoggedIn,
-    service: service,
   ));
 }
 
 class MainApp extends StatelessWidget {
   final bool isLoggedIn;
-  final FirestoreService service;
-  const MainApp({super.key, required this.isLoggedIn, required this.service});
+  const MainApp({super.key, required this.isLoggedIn});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

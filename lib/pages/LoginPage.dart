@@ -114,16 +114,14 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 80,
+        automaticallyImplyLeading: false, // Remove the back button
         centerTitle: true,     
           title: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(width: 10),
               Icon(Icons.lock_person_rounded, size: 40),
-              SizedBox(width: 10),
               Text("Password Manager",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
-              SizedBox(width: 10),
             ],
           ),
           backgroundColor: Colors.amber[50]),

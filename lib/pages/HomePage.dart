@@ -106,22 +106,23 @@ class _HomepageState extends State<Homepage> {
     return Scaffold(
       appBar: AppBar(
           toolbarHeight: 80,
+          automaticallyImplyLeading: false,
           centerTitle: true,
           title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              const SizedBox(width: 10),
+              const SizedBox(height: 15),
               Column(children: [
                 const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.lock_person_rounded, size: 30),
                       SizedBox(width: 10),
-                      Text("Password Manager",
+                      Text("Passwords",
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 30))
                     ]),
-                FutureBuilder(
+                    FutureBuilder(
                     future: service.getLoggedInName(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
