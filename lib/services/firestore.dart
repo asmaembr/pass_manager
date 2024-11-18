@@ -2,14 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pass_manager/models/Password.dart';
 import 'package:pass_manager/models/User.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'EncryptionHelper.dart';
 
 class FirestoreService {
-  final CollectionReference passwords =
-      FirebaseFirestore.instance.collection('passwords');
-  final CollectionReference users =
-      FirebaseFirestore.instance.collection('users');
+  final CollectionReference passwords = FirebaseFirestore.instance.collection('passwords');
+  final CollectionReference users = FirebaseFirestore.instance.collection('users');
 
-  // Get all accounts associated with the logged-in user
   Stream<QuerySnapshot> getPasswords() async* {
     try {
       final userSnapshot = await getLoggedInUser();
@@ -24,17 +22,16 @@ class FirestoreService {
     }
   }
 
-  // Create a new password entry
-  Future<String> createPassword(
-      String name, String username, String password) async {
+  Future<String> createPassword(String name, String username, String password) async {
     try {
       final user = await getLoggedInUser();
       if (user.docs.isNotEmpty) {
         String userId = user.docs.first.id;
-        await passwords.add(Password(
+        String encryptedPassword = EncryptionHelper.encrypt(password);
+       await passwords.add(Password(
                 name: name,
                 username: username,
-                password: password,
+                password: encryptedPassword,
                 user: userId)
             .toJson());
         return "Password Added";
@@ -46,31 +43,29 @@ class FirestoreService {
     }
   }
 
-  
 
-  // Update an existing password entry
-  Future<String> updatePassword(
-      String docID, String name, String username, String password) async {
-    try {
-      final user = await getLoggedInUser();
-      if (user.docs.isNotEmpty) {
-        String userId = user.docs.first.id;
-        await passwords.doc(docID).update(Password(
-                name: name,
-                username: username,
-                password: password,
-                user: userId)
-            .toJson());
-        return "Account Updated";
-      } else {
-        return "User not found";
-      }
-    } catch (e) {
-      return "Error: $e";
+Future<String> updatePassword(String docID, String name, String username, String password) async {
+  try {
+    final user = await getLoggedInUser();
+    if (user.docs.isNotEmpty) {
+      String userId = user.docs.first.id;
+      String encryptedPassword = EncryptionHelper.encrypt(password);
+
+     await passwords.doc(docID).update(Password(
+              name: name,
+              username: username,
+              password: encryptedPassword, 
+              user: userId)
+          .toJson());
+      return "Account Updated";
+    } else {
+      return "User not found";
     }
+  } catch (e) {
+    return "Error: $e";
   }
+}
 
-  // Delete an account entry by document ID
   Future<String> deletePassword(String docID) async {
     try {
       await passwords.doc(docID).delete();
@@ -80,7 +75,6 @@ class FirestoreService {
     }
   }
 
-  // Get the logged-in user from Firestore
   Future<QuerySnapshot> getLoggedInUser() async {
     String? userId = await _getUserId();
     if (userId != null) {
@@ -98,7 +92,6 @@ class FirestoreService {
     return snapshot.docs.first.get('name');
   }
 
-  // Get user by phone
   Future<QuerySnapshot> getUserByPhone(String telephone, String code) {
     return users
         .where('telephone', isEqualTo: telephone)
@@ -110,7 +103,6 @@ class FirestoreService {
     return passwords.where(FieldPath.documentId, isEqualTo: docID).get();
   }
 
-  // Get user by email
   Future<QuerySnapshot> getUserByEmail(String email, String code) {
     return users
         .where('email', isEqualTo: email)
@@ -118,7 +110,6 @@ class FirestoreService {
         .get();
   }
 
-  // Register a new user
   Future<String> registerUser(
       String name, String email, String telephone, String code) async {
     final phoneUser = await getUserByPhone(telephone, code);
@@ -134,7 +125,6 @@ class FirestoreService {
     }
   }
 
-  // Login user by email or phone number
   Future<bool> loginUser(String emailOrPhone, String code) async {
     try {
       final emailUser = await getUserByEmail(emailOrPhone, code);
@@ -155,19 +145,16 @@ class FirestoreService {
     }
   }
 
-  // Save user ID to local storage
   Future<void> _saveUserId(String userId) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('userId', userId);
   }
 
-  // Get user ID from local storage
   Future<String?> _getUserId() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('userId');
   }
 
-  // Logout user
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('userId');

@@ -6,8 +6,9 @@
 ## Fonctionnalités
 
 - Stockage sécurisé des mots de passe selon utilisateur
-- Connexion soit par email ou telephone 
+- Connexion soit par email ou télephone 
 - Générateur de mots de passe forts
+- Cryptage en AES des mots de passe
 
 ## Prérequis
 

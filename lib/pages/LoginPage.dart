@@ -65,7 +65,6 @@ class _LoginPageState extends State<LoginPage> {
             backgroundColor: Colors.amber[100],
             child: const Icon(Icons.check, color: Colors.black),
             onPressed: () async {
-              // Call registerUser asynchronously and await the result
               String result = await service.registerUser(
                 _nameController.text,
                 _emailController.text,
@@ -114,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 80,
-        automaticallyImplyLeading: false, // Remove the back button
+        automaticallyImplyLeading: false, 
         centerTitle: true,     
           title: const Row(
             mainAxisAlignment: MainAxisAlignment.center,

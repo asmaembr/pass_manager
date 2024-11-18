@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pass_manager/pages/LoginPage.dart';
+import 'package:pass_manager/services/EncryptionHelper.dart';
 import 'package:pass_manager/services/firestore.dart';
 import 'dart:math';
 
@@ -17,7 +18,6 @@ class _HomepageState extends State<Homepage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  // Map to store visibility status for each password
   Map<int, bool> _isPasswordVisibleMap = {};
 
   void clearControllers() {
@@ -26,7 +26,6 @@ class _HomepageState extends State<Homepage> {
     passwordController.clear();
   }
 
-  // Generate a random password
   String generateRandomPassword() {
     const length = 12;
     const String chars =
@@ -36,104 +35,108 @@ class _HomepageState extends State<Homepage> {
         length, (_) => chars.codeUnitAt(random.nextInt(chars.length))));
   }
 
-void openPasswordForm(String? docID) async {
-  if (docID != null) {
-    QuerySnapshot snapshot = await service.getPasswordById(docID);
+  void openPasswordForm(String? docID) async {
+    if (docID != null) {
+      QuerySnapshot snapshot = await service.getPasswordById(docID);
 
-    if (snapshot.docs.isNotEmpty) {
-      var passwordData = snapshot.docs.first.data() as Map<String, dynamic>;
-      nameController.text = passwordData['name'] ?? '';
-      usernameController.text = passwordData['username'] ?? '';
-      passwordController.text = passwordData['password'] ?? '';
+      if (snapshot.docs.isNotEmpty) {
+        var passwordData = snapshot.docs.first.data() as Map<String, dynamic>;
+        nameController.text = passwordData['name'] ?? '';
+        usernameController.text = passwordData['username'] ?? '';
+        passwordController.text = passwordData['password'] ?? '';
+      }
+    } else {
+      passwordController.text = generateRandomPassword();
     }
-  } else {
-    passwordController.text = generateRandomPassword(); // Auto-generate password for new entry
-  }
 
-  await showDialog(
-    context: context,
-    builder: (context) {
-      bool isPasswordVisible = false; // Local state for visibility inside the dialog
+    await showDialog(
+      context: context,
+      builder: (context) {
+        bool isPasswordVisible = false;
 
-      return AlertDialog(
-        title: Center(
-          child: Text(
-            docID != null ? "Edit Password" : "Add Password",
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ),
-        backgroundColor: Colors.amber[50],
-        content: StatefulBuilder(
-          builder: (context, setState) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  decoration: const InputDecoration(labelText: "Name"),
-                  controller: nameController,
-                ),
-                TextField(
-                  decoration: const InputDecoration(labelText: "Username or email"),
-                  controller: usernameController,
-                ),
-                TextField(
-                  controller: passwordController,
-                  obscureText: !isPasswordVisible,
-                  decoration: InputDecoration(
-                    labelText: "Password",
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          isPasswordVisible = !isPasswordVisible;
-                        });
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              if (docID != null) {
-                service.updatePassword(
-                  docID,
-                  nameController.text,
-                  usernameController.text,
-                  passwordController.text,
-                );
-              } else {
-                service.createPassword(
-                  nameController.text,
-                  usernameController.text,
-                  passwordController.text,
-                );
-              }
-              clearControllers();
-              Navigator.pop(context);
-            },
+        return AlertDialog(
+          title: Center(
             child: Text(
-              docID != null ? "Save Changes" : "Add Password",
-              style: const TextStyle(color: Colors.black),
+              docID != null ? "Edit Password" : "Add Password",
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
-          TextButton(
-            onPressed: () {
-              clearControllers();
-              Navigator.pop(context);
+          backgroundColor: Colors.amber[50],
+          content: StatefulBuilder(
+            builder: (context, setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    decoration: const InputDecoration(labelText: "Name"),
+                    controller: nameController,
+                  ),
+                  TextField(
+                    decoration:
+                        const InputDecoration(labelText: "Username or email"),
+                    controller: usernameController,
+                  ),
+                  TextField(
+                    controller: passwordController,
+                    obscureText: !isPasswordVisible,
+                    decoration: InputDecoration(
+                      labelText: "Password",
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            isPasswordVisible = !isPasswordVisible;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              );
             },
-            child: const Text("Cancel", style: TextStyle(color: Colors.black)),
           ),
-        ],
-      );
-    },
-  );
-}
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (docID != null) {
+                  service.updatePassword(
+                    docID,
+                    nameController.text,
+                    usernameController.text,
+                    passwordController.text,
+                  );
+                } else {
+                  service.createPassword(
+                    nameController.text,
+                    usernameController.text,
+                    passwordController.text,
+                  );
+                }
+                clearControllers();
+                Navigator.pop(context);
+              },
+              child: Text(
+                docID != null ? "Save Changes" : "Add Password",
+                style: const TextStyle(color: Colors.black),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                clearControllers();
+                Navigator.pop(context);
+              },
+              child:
+                  const Text("Cancel", style: TextStyle(color: Colors.black)),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -189,8 +192,15 @@ void openPasswordForm(String? docID) async {
       body: StreamBuilder<QuerySnapshot>(
         stream: service.getPasswords(),
         builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
           if (snapshot.hasData) {
             List accountList = snapshot.data!.docs;
+            if (accountList.isEmpty) {
+              return const Center(child: Text("No passwords saved"));
+            }
 
             return ListView.builder(
               itemCount: accountList.length,
@@ -200,8 +210,9 @@ void openPasswordForm(String? docID) async {
                 Map<String, dynamic> accountData =
                     account.data() as Map<String, dynamic>;
                 String name = accountData['name'];
-                String username = accountData['username'];
-                String password = accountData['password'];
+                String username = accountData['username']; 
+                String encryptedPassword = accountData['password'] ?? '';
+                String password = EncryptionHelper.decrypt(encryptedPassword); 
 
                 bool isPasswordVisible = _isPasswordVisibleMap[index] ?? false;
 
