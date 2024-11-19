@@ -18,7 +18,7 @@ class _HomepageState extends State<Homepage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  Map<int, bool> _isPasswordVisibleMap = {};
+  final Map<int, bool> _isPasswordVisibleMap = {};
 
   void clearControllers() {
     nameController.clear();
@@ -41,9 +41,9 @@ class _HomepageState extends State<Homepage> {
 
       if (snapshot.docs.isNotEmpty) {
         var passwordData = snapshot.docs.first.data() as Map<String, dynamic>;
-        nameController.text = passwordData['name'] ?? '';
-        usernameController.text = passwordData['username'] ?? '';
-        passwordController.text = passwordData['password'] ?? '';
+        nameController.text = passwordData['name'] ;
+        usernameController.text = passwordData['username'] ;
+        passwordController.text = EncryptionHelper.decrypt(passwordData['password']);
       }
     } else {
       passwordController.text = generateRandomPassword();
