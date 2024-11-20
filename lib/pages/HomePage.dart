@@ -1,3 +1,4 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pass_manager/pages/LoginPage.dart';
@@ -27,7 +28,7 @@ class _HomepageState extends State<Homepage> {
   }
 
   String generateRandomPassword() {
-    const length = 12;
+    int length = Random().nextInt(15) + 5;
     const String chars =
         'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#\$%^&*()-_+=<>?';
     Random random = Random();
@@ -41,9 +42,10 @@ class _HomepageState extends State<Homepage> {
 
       if (snapshot.docs.isNotEmpty) {
         var passwordData = snapshot.docs.first.data() as Map<String, dynamic>;
-        nameController.text = passwordData['name'] ;
-        usernameController.text = passwordData['username'] ;
-        passwordController.text = EncryptionHelper.decrypt(passwordData['password']);
+        nameController.text = passwordData['name'];
+        usernameController.text = passwordData['username'];
+        passwordController.text =
+            EncryptionHelper.decrypt(passwordData['password']);
       }
     } else {
       passwordController.text = generateRandomPassword();
@@ -81,17 +83,31 @@ class _HomepageState extends State<Homepage> {
                     obscureText: !isPasswordVisible,
                     decoration: InputDecoration(
                       labelText: "Password",
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          isPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            isPasswordVisible = !isPasswordVisible;
-                          });
-                        },
+                      suffixIcon: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                isPasswordVisible = !isPasswordVisible;
+                              });
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.refresh),
+                            onPressed: () {
+                              setState(() {
+                                passwordController.text =
+                                    generateRandomPassword();
+                              });
+                            },
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -210,9 +226,9 @@ class _HomepageState extends State<Homepage> {
                 Map<String, dynamic> accountData =
                     account.data() as Map<String, dynamic>;
                 String name = accountData['name'];
-                String username = accountData['username']; 
+                String username = accountData['username'];
                 String encryptedPassword = accountData['password'] ?? '';
-                String password = EncryptionHelper.decrypt(encryptedPassword); 
+                String password = EncryptionHelper.decrypt(encryptedPassword);
 
                 bool isPasswordVisible = _isPasswordVisibleMap[index] ?? false;
 
