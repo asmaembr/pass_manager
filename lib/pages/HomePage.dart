@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pass_manager/pages/LoginPage.dart';
@@ -63,7 +62,7 @@ class _HomepageState extends State<Homepage> {
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
-          backgroundColor: Colors.amber[50],
+          backgroundColor: Colors.purple[50],
           content: StatefulBuilder(
             builder: (context, setState) {
               return Column(
@@ -158,33 +157,41 @@ class _HomepageState extends State<Homepage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          toolbarHeight: 80,
+          toolbarHeight: 90,
           automaticallyImplyLeading: false,
           centerTitle: true,
           title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const SizedBox(height: 15),
-              Column(children: [
-                const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.lock_person_rounded, size: 30),
-                      SizedBox(width: 10),
-                      Text("Passwords",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 30))
-                    ]),
-                FutureBuilder(
-                    future: service.getLoggedInName(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return Text(snapshot.data.toString());
-                      } else {
-                        return const Text("Loading ...");
-                      }
-                    })
-              ]),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image(
+                    image: AssetImage("assets/icon.png"),
+                    width: 40,
+                    height: 40,
+                  ),
+                  Text("Password123",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                ],
+              ),
+              FutureBuilder(
+                  future: service.getLoggedInName(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Text(
+                        "Welcome, ${snapshot.data.toString()}",
+                        style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            fontStyle: FontStyle.italic,
+                            color: Color.fromRGBO(74, 20, 140, 1)),
+                      );
+                    } else {
+                      return const Text("Loading ...");
+                    }
+                  }),
               IconButton(
                   iconSize: 30,
                   onPressed: () => {
@@ -197,10 +204,10 @@ class _HomepageState extends State<Homepage> {
                   icon: const Icon(Icons.logout))
             ],
           ),
-          backgroundColor: Colors.amber[50]),
-      backgroundColor: Colors.amber[50],
+          backgroundColor: Colors.purple[50]),
+      backgroundColor: Colors.purple[50],
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.amber[100],
+        backgroundColor: Colors.pink[100],
         heroTag: 'addPasswordButton',
         onPressed: () => openPasswordForm(null),
         child: const Icon(Icons.add),
@@ -237,7 +244,7 @@ class _HomepageState extends State<Homepage> {
                       vertical: 8.0, horizontal: 16.0),
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
-                    color: Colors.amber[100],
+                    color: Colors.purple[100],
                     borderRadius: BorderRadius.circular(10.0),
                     boxShadow: [
                       BoxShadow(

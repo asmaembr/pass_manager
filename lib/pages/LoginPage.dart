@@ -35,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
           child:
               Text("Register", style: TextStyle(fontWeight: FontWeight.bold)),
         ),
-        backgroundColor: Colors.amber[50],
+        backgroundColor: Colors.purple[50],
         content: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -45,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
               controller: _nameController,
             ),
             TextField(
-              decoration: const InputDecoration(labelText: "telephone"),
+              decoration: const InputDecoration(labelText: "phone number"),
               controller: _telephoneController,
             ),
             TextField(
@@ -53,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
               controller: _emailController,
             ),
             TextField(
-              decoration: const InputDecoration(labelText: "code confidentiel"),
+              decoration: const InputDecoration(labelText: "code"),
               controller: _registercodeController,
               obscureText: true,
             ),
@@ -62,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
         actions: [
           FloatingActionButton(
             mini: true,
-            backgroundColor: Colors.amber[100],
+            backgroundColor: Colors.indigo[200],
             child: const Icon(Icons.check, color: Colors.black),
             onPressed: () async {
               String result = await service.registerUser(
@@ -112,47 +112,50 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 80,
-        automaticallyImplyLeading: false, 
-        centerTitle: true,     
+          toolbarHeight: 80,
+          automaticallyImplyLeading: false,
+          centerTitle: true,
           title: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.lock_person_rounded, size: 40),
-              Text("Password Manager",
+              Image(
+                image: AssetImage("assets/icon.png"),
+                width: 50,
+                height: 50,
+              ),
+              Text("Password123",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
             ],
           ),
-          backgroundColor: Colors.amber[50]),
-      backgroundColor: Colors.amber[50],
+          backgroundColor: Colors.purple[50]),
+      backgroundColor: Colors.purple[50],
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(80),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
               controller: _usernameController,
-              decoration:
-                  const InputDecoration(labelText: 'telephone ou email'),
+              decoration: const InputDecoration(labelText: 'phone or email'),
             ),
             TextField(
               controller: _codeController,
               obscureText: true,
-              decoration: const InputDecoration(labelText: 'code confidentiel'),
+              decoration: const InputDecoration(labelText: 'code'),
             ),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 FloatingActionButton(
-                  backgroundColor: Colors.amber[100],
+                  backgroundColor: Colors.pink[100],
                   onPressed: _loginUser,
                   heroTag: 'loginButton',
                   child: const Icon(Icons.login, color: Colors.black),
                 ),
                 const SizedBox(width: 20),
                 FloatingActionButton(
-                  backgroundColor: Colors.amber[100],
+                  backgroundColor: Colors.pink[100],
                   onPressed: openUserForm,
                   heroTag: 'registerButton',
                   child: const Icon(Icons.person_add, color: Colors.black),

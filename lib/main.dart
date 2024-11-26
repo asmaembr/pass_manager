@@ -25,7 +25,7 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Scaffold(
-          backgroundColor: Colors.amber[50],
+          backgroundColor: Colors.purple[50],
           body: isLoggedIn ? const Homepage() : const LoginPage(),
         ));
   }
