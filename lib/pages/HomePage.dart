@@ -181,7 +181,7 @@ class _HomepageState extends State<Homepage> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return Text(
-                        "Welcome, ${snapshot.data.toString()}",
+                        snapshot.data.toString(),
                         style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
