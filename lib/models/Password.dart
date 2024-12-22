@@ -10,7 +10,7 @@ class Password {
     required this.password,
     required this.user,
   });
-
+//* changing the map to json
   factory Password.fromJson(Map<String, dynamic> json) {
     return Password(
       name: json['name'],
@@ -19,7 +19,7 @@ class Password {
       user: json['user'],
     );
   }
-
+//* changing the json to map
   Map<String, dynamic> toJson() => {
         'name': name,
         'username': username,

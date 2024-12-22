@@ -11,7 +11,7 @@ class User {
     required this.code,
   });
 
-  // Factory constructor to create a User from JSON
+  //* Factory constructor to create a User from JSON
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       name: json['name'],
@@ -21,7 +21,7 @@ class User {
     );
   }
 
-  // Convert User to JSON
+  //* Convert User to JSON
   Map<String, dynamic> toJson() => {
         'name': name,
         'email': email,

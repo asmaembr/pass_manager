@@ -10,6 +10,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _telephoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -26,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
     _registercodeController.clear();
     _telephoneController.clear();
   }
-
+//* register form with a showdialog implementation
   void openUserForm() {
     showDialog(
       context: context,
@@ -43,6 +44,7 @@ class _LoginPageState extends State<LoginPage> {
             TextField(
               decoration: const InputDecoration(labelText: "name"),
               controller: _nameController,
+
             ),
             TextField(
               decoration: const InputDecoration(labelText: "phone number"),
@@ -89,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
+//* login function 
   Future<void> _loginUser() async {
     bool loginSuccess = await service.loginUser(
       _usernameController.text,
@@ -110,59 +112,64 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          toolbarHeight: 80,
-          automaticallyImplyLeading: false,
-          centerTitle: true,
-          title: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image(
-                image: AssetImage("assets/icon.png"),
-                width: 50,
-                height: 50,
-              ),
-              Text("Password123",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
-            ],
-          ),
-          backgroundColor: Colors.purple[50]),
-      backgroundColor: Colors.purple[50],
-      body: Padding(
-        padding: const EdgeInsets.all(80),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _usernameController,
-              decoration: const InputDecoration(labelText: 'phone or email'),
-            ),
-            TextField(
-              controller: _codeController,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: 'code'),
-            ),
-            const SizedBox(height: 20),
-            Row(
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        appBar: AppBar(
+            toolbarHeight: 80,
+            automaticallyImplyLeading: false,
+            centerTitle: true,
+            title: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                FloatingActionButton(
-                  backgroundColor: Colors.pink[100],
-                  onPressed: _loginUser,
-                  heroTag: 'loginButton',
-                  child: const Icon(Icons.login, color: Colors.black),
+                Image(
+                  image: AssetImage("assets/icon.png"),
+                  width: 50,
+                  height: 50,
                 ),
-                const SizedBox(width: 20),
-                FloatingActionButton(
-                  backgroundColor: Colors.pink[100],
-                  onPressed: openUserForm,
-                  heroTag: 'registerButton',
-                  child: const Icon(Icons.person_add, color: Colors.black),
-                ),
+                Text("Password123",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
               ],
-            )
-          ],
+            ),
+            backgroundColor: Colors.purple[50]),
+        backgroundColor: Colors.purple[50],
+        body: Padding(
+          padding: const EdgeInsets.all(80),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextField(
+                controller: _usernameController,
+                decoration: const InputDecoration(labelText: 'phone or email'),
+              ),
+              TextField(
+                controller: _codeController,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'code'),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  //* login button
+                  FloatingActionButton(
+                    backgroundColor: Colors.pink[100],
+                    onPressed: _loginUser,
+                    heroTag: 'loginButton',
+                    child: const Icon(Icons.login, color: Colors.black),
+                  ),
+                  const SizedBox(width: 20),
+                  //* register button
+                  FloatingActionButton(
+                    backgroundColor: Colors.pink[100],
+                    onPressed: openUserForm,
+                    heroTag: 'registerButton',
+                    child: const Icon(Icons.person_add, color: Colors.black),
+                  ),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
