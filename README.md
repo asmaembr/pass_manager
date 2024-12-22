@@ -40,5 +40,5 @@
 
 ## Réalisée par
 
-    Cette application a été réalisée par le binome `Asmae Moubarriz - Achraf Akrache` dans le cadre de leur projet d'évalution pour la matiére ` Web Sphere `.
+Cette application a été réalisée par le binome `Asmae Moubarriz - Achraf Akrache` dans le cadre de leur projet d'évalution pour la matiére ` Web Sphere `.
 
