@@ -25,12 +25,12 @@ class FirestoreService {
     }
   }
 
-//* creating the password (name , pass and username ) after checking taht the user is logged in
+//* creating the password (name , pass and username ) after checking that the user is logged in
   Future<String> createPassword(
       String name, String username, String password) async {
     try {
       final user = await getLoggedInUser();
-      if (user.docs.isNotEmpty) {
+      if (user.docs.isNotEmpty || name.isNotEmpty || username.isNotEmpty || password.isNotEmpty) {
         String userId = user.docs.first.id;
         String encryptedPassword = EncryptionHelper.encrypt(password);
         await passwords.add(Password(
